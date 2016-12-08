@@ -1,0 +1,35 @@
+Juniper commands�(I like to stick with numbers for terms, which makes it easier for me to understand)
+
+set firewall filter BLOCK_ACCESS term 1 from source-address 192.168.0.0/24
+set firewall filter BLOCK_ACCESS term 1 from destination-address 192.168.2.0/24
+set firewall filter BLOCK_ACCESS term 1 from destination-port 22
+set firewall filter BLOCK_ACCESS term 1 from destination-port 80
+set firewall filter BLOCK_ACCESS term 1 from destination-port ftp
+set firewall filter BLOCK_ACCESS term 1 then reject
+set firewall filter BLOCK_ACCESS term 2 from source-address 192.168.10.0/24
+set firewall filter BLOCK_ACCESS term 2 from destination-address 192.168.20.0/24
+set firewall filter BLOCK_ACCESS term 2 from destination-port 22
+set firewall filter BLOCK_ACCESS term 2 from destination-port 443
+set firewall filter BLOCK_ACCESS term 2 then reject
+set firewall filter BLOCK_ACCESS term 3 from source-address 192.168.30.0/24
+set firewall filter BLOCK_ACCESS term 3 from destination-address 192.168.40.0/24
+set firewall filter BLOCK_ACCESS term 3 from destination-port 2200
+set firewall filter BLOCK_ACCESS term 3 from destination-port 8080
+set firewall filter BLOCK_ACCESS term 3 from destination-port 32000
+set firewall filter BLOCK_ACCESS term 3 then accept
+
+set firewall filter BLOCK_ACCESS_1 term 1 from source-address 192.168.0.0/24
+set firewall filter BLOCK_ACCESS_1 term 1 from destination-address 192.168.2.0/24
+set firewall filter BLOCK_ACCESS_1 term 1 from destination-port 53
+set firewall filter BLOCK_ACCESS_1 term 1 from destination-port ntp
+set firewall filter BLOCK_ACCESS_1 term 1 from destination-port snmp
+set firewall filter BLOCK_ACCESS_1 term 1 then reject
+set firewall filter BLOCK_ACCESS_1 term 2 from source-address 192.168.10.0/24
+set firewall filter BLOCK_ACCESS_1 term 2 from destination-address 192.168.20.0/24
+set firewall filter BLOCK_ACCESS_1 term 2 from destination-port 10000
+set firewall filter BLOCK_ACCESS_1 term 2 then accept
+
+set interfaces em0 unit 0 family inet filter input BLOCK_ACCESS
+set interfaces em0 unit 0 family inet address 192.168.0.1/24
+set interfaces em1 unit 0 family inet address 192.168.2.1/24
+

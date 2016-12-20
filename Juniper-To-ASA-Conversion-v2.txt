@@ -1,0 +1,12 @@
+set service "1525" protocol tcp src-port 0-65535 dst-port 1525-1525
+set service "TELNET" protocol tcp src-port 0-65535 dst-port 23-23
+
+set group service "TCAM Ports" comment "PORT 23 and 1525"
+set group service "TCAM Ports" add "1525"
+set group service "TCAM Ports" add "TELNET"
+
+set address "Inside" "FSTDCO07" 147.51.45.69 255.255.255.255 "TCAM Workstation"
+set address "Outside" "Einsenhower Medical Center" 160.141.10.10 255.255.255.255 "For TCAM"
+
+set group address "Inside" "TCAM Workstations" add "FSTDCO07"
+set policy id 54 name "TCAM" from "Inside" to "Outside" "TCAM Workstations" "Eisenhower Medical Center" "TCAM Ports" permit

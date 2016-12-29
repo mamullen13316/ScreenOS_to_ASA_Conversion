@@ -1,0 +1,85 @@
+set service "RDP" protocol tcp src-port 0-65535 dst-port 3389-3389 timeout never
+set service "TCP 45201-203" protocol tcp src-port 0-65535 dst-port 45201-45203
+set service "TCP 1494" protocol tcp src-port 0-65535 dst-port 1494-1494
+set service "TCP 8443" protocol tcp src-port 0-65535 dst-port 8443-8443
+
+
+set address "Inside" "10.1.1.0/24" 10.1.1.0 255.255.255.0
+set address "Inside" "10.1.1.10/32" 10.1.1.10 255.255.255.255
+set address "Inside" "10.1.1.11/32" 10.1.1.11 255.255.255.255
+set address "Inside" "10.1.1.12/32" 10.1.1.12 255.255.255.255
+set address "Inside" "Net 2" 10.2.2.0 255.255.255.0 "VLAN 2"
+set address "Inside" "10.2.2.10/32" 10.2.2.10 255.255.255.255 "Web Srvr 1"
+set address "Inside" "10.2.2.11/32" 10.2.2.11 255.255.255.255 "Web Srvr 2"
+set address "Inside" "10.3.3.0/24" 10.3.3.0 255.255.255.0
+set address "Inside" "10.3.3.10/32" 10.3.3.10 255.255.255.255 "Term Srvr 1"
+set adddess "Inside" "10.3.3.11/32" 10.3.3.11 255.255.255.255 "Term Srvr 2"
+set address "Inside" "10.3.3.12/32" 10.3.3.12 255.255.255.255
+set address "Inside" "10.4.4.0/24" 10.4.4.0 255.255.255.0 "VLAN 4"
+set address "Inside" "SMTP Svr 1" 10.4.4.10 255.255.255.255 "SMTP Server 1"
+set address "Inside" "SMTP Svr 2" 10.4.4.11 255.255.255.255 "SMTP Server 2"
+set address "Inside" "Inside Net 5" 10.5.5.0 255.255.255.0
+set address "Inside" "Inside Net 6" 10.6.6.0 255.255.255.0
+set address "Inside" "Inside Net 7" 10.7.7.0 255.255.255.0
+set address "Outside" "Outside Net 1" 99.99.99.0 255.255.255.0
+set address "Outside" "Outside Net 2" 88.88.88.0 255.255.255.0
+set address "Outside" "Outside Net 3" 77.77.77.0 255.255.255.0
+set address "Outside" "Some remote user" 99.99.99.99 255.255.255.255
+
+set group address "Inside" "SMTP Servers"
+set group address "Inside" "SMTP Servers" add "SMTP Svr 1"
+set group address "Inside" "SMTP Servers" add "SMTP Svr 2"
+set group address "Inside" "Web Servers"
+set group address "Inside" "Web Servers" add "10.2.2.10/32"
+set group address "Inside" "Web Servers" add "10.2.2.11/32"
+set group address "Inside" "Term Srvrs"
+set group address "Inside" "Term Srvrs" add "10.3.3.10/32"
+set group address "Inside" "Term Srvrs" add "10.3.3.11/32"
+set group address "Outside" "VLAN 30 Hosts"
+set group address "Outside" "VLAN 30 Hosts" add "10.3.3.10/32"
+set group address "Outside" "VLAN 30 Hosts" add "10.3.3.11/32"
+
+set group service "Term Srvr Ports"
+set group service "Term Srvr Ports" add "RDP"
+set group service "Term Srvr Ports" add "TCP 1494"
+
+set group service "App Services"
+set group service "App Services" add "TCP 45201-203"
+set group service "App Services" add "TCP 8443"
+
+set policy id 100 from "Outside" to "Inside" "Any" "Any" "ICMP-ANY" permit log
+set policy id 100
+exit
+set policy id 101 from "Outside" to "Inside" "Any" "Web Srvrs" "HTTP" permit log
+set policy id 101
+exit
+set policy id 102 from "Outside" to "Inside" "Any" "SMTP Servers" "SMTP" permit
+set policy id 102
+set src-address "10.3.3.10/32"
+set src-address "10.3.3.11/32"
+exit
+set policy id 103 name "Web to App" from "Outside" to "Inside" "Web Srvr" "App Srvr" "App Services" permit
+set policy id 103
+set service "App Services"
+exit
+set policy id 104 name "Outside to Term Srvrs" from "Outside" to "Inside" "Any" "Term Srvrs" "RDP" permit
+set policy id 104
+set service "TCP 1494"
+exit
+set policy id 105 name "Some remote user to some servers" from "Outside" to "Inside" "Some remote user" "10.1.1.10/32" "HTTP" permit
+set policy id 105
+set dst-address "10.1.1.11/32"
+
+set policy id 106 from "Outside" to "Inside" "Outside Net 1" "Inside Net 5" "TCP 45201-203" permit log
+set policy id 106
+set dst-address "Inside Net 6"
+set dst-address "Inside Net 7"
+set service "FTP"
+set service "HTTP"
+set service "TCP 8443"
+
+set policy id 107 from "Outside" to "Inside"  "Outside Net 1" "Inside Net 1" "HTTP" permit
+set policy id 107
+set src-address "Outside Net 2"
+set dst-address "Inside Net 2"
+set service "FTP"
